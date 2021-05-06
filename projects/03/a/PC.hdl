@@ -16,5 +16,19 @@ CHIP PC {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // convert reset, load, inc to 2-bits
+    Or(a=reset, b=load, out=sel1);
+    Not(in=load, out=notload);
+    And(a=notload, b=inc, out=niand);
+    Or(a=reset, b=niand, out=sel0);
+
+    // inc
+    Inc16(in=regout, out=incout);
+
+    // select by control bit
+    Mux4Way16(a=regout, b=incout, c=in, d=false, sel[0]=sel0, sel[1]=sel1, out=regin);
+
+    // load bit for Registor
+    Or(a=sel0, b=sel1, out=orout1);
+    Register(in=regin, load=orout1, out=regout, out=out);
 }
